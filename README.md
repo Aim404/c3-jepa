@@ -8,12 +8,12 @@ world model for near-field heavy-load underwater ROV salvage.
 
 ![C³-JEPA architecture](assets/architecture.png)
 
-*Method overview (figure from the paper): stage I grounds synchronized multi-view RGB
-into bound object slots plus free context slots; stage II injects the control latent and
-predicts the state autoregressively. This repository implements that pipeline.*
+*Method overview (from the paper): stage I grounds the multi-view frames into bound
+object slots plus context slots, stage II predicts them autoregressively under the
+control latent.*
 
-One file, one command, no dataset required — the script generates its own synthetic
-recordings and runs the full train + test loop on CPU in about a minute:
+One file, one command: it generates its own synthetic recordings and runs the train +
+test loop on CPU in about a minute:
 
 ```bash
 pip install -r requirements.txt
@@ -32,17 +32,13 @@ python c3_jepa.py smoke
 [smoke] OK — training and testing both ran end to end.
 ```
 
-The synthetic run is a wiring test, not a benchmark: it checks that the tokenizer,
-the binding term, the held-out-view fusion, SIGReg and the predictor all train, and
-that the 8-step rollout beats the persistence baseline on recordings kept out of
-training. That is all those numbers mean — the paper's results come from the full
-pipeline on real data, not from this file.
+The smoke run is a wiring test, not a benchmark: everything trains, and the 8-step
+rollout beats persistence on the two recordings held out of training. The paper's
+numbers come from the full pipeline on real data.
 
 ![smoke run](assets/smoke_run.png)
 
-*The default `smoke` run, plotted from `runs/smoke/metrics.json`. Left: the 8-step latent
-rollout overtakes the persistence baseline once the tokenizer has specialised; the shaded
-area is where the model wins. Right: the weak-binding term that drives that specialisation.*
+*From `runs/smoke/metrics.json`: rollout vs persistence (left), binding loss (right).*
 
 ## What is implemented
 
@@ -77,16 +73,6 @@ multi-view frames ──► patch tokens ──► per-view slot attention (6 sl
   step is a mask query + anchor + time embedding, and controls enter as separate
   auxiliary entity tokens — never pooled into visual slots.
 
-### What the full pipeline produces
-
-![rollout evidence](assets/rollout_evidence.png)
-
-*From the paper — **not reproduced by this repository**: recorded (blue) and predicted
-(orange) mask-centroid tracks of the task object over 3 s rollouts, far and close range.
-Those numbers come from the full training/evaluation harness on the 229-recording
-interaction set; this file contains the method, not the harness.*
-
-
 Losses follow Eq. 2 of the paper plus the two auxiliary weights of its Table 1:
 
 ```
@@ -106,9 +92,8 @@ slot width `d_s = 256` (adapted to 128 inside the predictor), history `4` steps
 | `python c3_jepa.py train --data-dir data/recs --out-dir runs/example` | train on real recordings |
 | `python c3_jepa.py test --data-dir data/recs --ckpt runs/example/ckpt/best.pt` | evaluate a checkpoint |
 
-The test path reports the rollout error **against the persistence baseline**
-(`val_pred_mse`, `persist_mse`, `persist_improvement_pct`) so that a number is
-never quoted without the baseline it beats.
+The test path reports the rollout error next to the persistence baseline
+(`val_pred_mse`, `persist_mse`, `persist_improvement_pct`).
 
 ## Data
 
@@ -128,10 +113,9 @@ automatically; everything else still trains.
 
 ![data interface](assets/data_interface.gif)
 
-*The synthetic smoke data — two synchronised views with the three weak patch-level masks
-the binding term consumes. The counter marks the history (given) and the future (scored)
-part of each window. Real recordings feed the same tensors, with patch tokens from a
-frozen DINOv3-L backbone instead of the stand-in encoder.*
+*Synthetic smoke data: two views with the three weak masks the binding term uses. Real
+recordings feed the same tensors, with patch tokens from a frozen backbone instead of the
+stand-in encoder.*
 
 **Precomputed backbone features (the setting used in the paper).** Pass
 `--cached-features DIR` containing `<recording>_<view>_feat.npy` of shape
@@ -143,14 +127,9 @@ anywhere.
 The recordings, the trained weights and the derived datasets of the paper are not
 distributed here.
 
-## Notes and limitations
+## Scope
 
-* This is a **reference implementation**, not the experiment harness: it contains
-  the method, not the sweep infrastructure. The numbers in the paper come from the
-  full training/evaluation pipeline and are not reproduced by `smoke`.
-* The synthetic generator exists only to exercise both code paths end to end.
-* Multi-view geometry, the ROV simulator and the field trials are outside this
-  file; the interface above is what the paper's experiments feed into it.
+Multi-view geometry, the ROV simulator and the field trials live in separate projects.
 
 ## Citation
 
