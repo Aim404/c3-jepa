@@ -1,8 +1,16 @@
 # C³-JEPA — minimal reference implementation
 
+[**Paper**](https://arxiv.org/abs/2609.30214) · [PDF](https://arxiv.org/pdf/2609.30214) · arXiv:2609.30214 (cs.RO) · MIT
+
 Minimal, self-contained implementation of **Underwater C³-JEPA** (cross-view,
 control-conditioned, context-extended): an object-centric multi-view predictive
 world model for near-field heavy-load underwater ROV salvage.
+
+![C³-JEPA architecture](assets/architecture.png)
+
+*Method overview (figure from the paper): stage I grounds synchronized multi-view RGB
+into bound object slots plus free context slots; stage II injects the control latent and
+predicts the state autoregressively. This repository implements that pipeline.*
 
 One file, one command, no dataset required — the script generates its own synthetic
 recordings and runs the full train + test loop on CPU in about a minute:
@@ -29,6 +37,12 @@ the binding term, the held-out-view fusion, SIGReg and the predictor all train, 
 that the 8-step rollout beats the persistence baseline on recordings kept out of
 training. That is all those numbers mean — the paper's results come from the full
 pipeline on real data, not from this file.
+
+![smoke run](assets/smoke_run.png)
+
+*The default `smoke` run, plotted from `runs/smoke/metrics.json`. Left: the 8-step latent
+rollout overtakes the persistence baseline once the tokenizer has specialised; the shaded
+area is where the model wins. Right: the weak-binding term that drives that specialisation.*
 
 ## What is implemented
 
@@ -62,6 +76,16 @@ multi-view frames ──► patch tokens ──► per-view slot attention (6 sl
   held across the whole history window, `t = 0` is an identity anchor, each future
   step is a mask query + anchor + time embedding, and controls enter as separate
   auxiliary entity tokens — never pooled into visual slots.
+
+### What the full pipeline produces
+
+![rollout evidence](assets/rollout_evidence.png)
+
+*From the paper — **not reproduced by this repository**: recorded (blue) and predicted
+(orange) mask-centroid tracks of the task object over 3 s rollouts, far and close range.
+Those numbers come from the full training/evaluation harness on the 229-recording
+interaction set; this file contains the method, not the harness.*
+
 
 Losses follow Eq. 2 of the paper plus the two auxiliary weights of its Table 1:
 
@@ -102,6 +126,13 @@ All paths are relative. One `.npz` per recording under `--data-dir`:
 `N = (H // patch) ** 2`. When a weak mask is missing its binding term is skipped
 automatically; everything else still trains.
 
+![data interface](assets/data_interface.gif)
+
+*The synthetic smoke data — two synchronised views with the three weak patch-level masks
+the binding term consumes. The counter marks the history (given) and the future (scored)
+part of each window. Real recordings feed the same tensors, with patch tokens from a
+frozen DINOv3-L backbone instead of the stand-in encoder.*
+
 **Precomputed backbone features (the setting used in the paper).** Pass
 `--cached-features DIR` containing `<recording>_<view>_feat.npy` of shape
 `(T, N, D)` produced by a frozen DINOv3-L patch encoder. The rest of the pipeline
@@ -122,6 +153,8 @@ distributed here.
   file; the interface above is what the paper's experiments feed into it.
 
 ## Citation
+
+Paper: <https://arxiv.org/abs/2609.30214>
 
 ```bibtex
 @misc{yang2026underwaterc3jepa,
