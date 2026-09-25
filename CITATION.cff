@@ -1,0 +1,46 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "C3-JEPA — minimal reference implementation"
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/Aim404/c3-jepa"
+abstract: >-
+  Minimal, self-contained implementation of Underwater C3-JEPA an object-centric,
+  cross-view, control-conditioned predictive world model for ROV salvage: slot-attention
+  tokenizer, held-out-view cross-view fusion, weak binding, SIGReg and a
+  control-conditioned predictor, in a single trainable and testable script.
+authors:
+  - family-names: Yang
+    given-names: Yuncong
+  - family-names: Li
+    given-names: Jinlong
+  - family-names: Xue
+    given-names: Yulong
+  - family-names: Wu
+    given-names: Feng
+  - family-names: Zhang
+    given-names: Chunwen
+  - family-names: Qiao
+    given-names: Lei
+  - family-names: Wang
+    given-names: Xuyang
+preferred-citation:
+  type: article
+  title: "Underwater C3-JEPA: An Object-Centric Cross-View World Model for ROV Salvage"
+  authors:
+    - family-names: Yang
+      given-names: Yuncong
+    - family-names: Li
+      given-names: Jinlong
+    - family-names: Xue
+      given-names: Yulong
+    - family-names: Wu
+      given-names: Feng
+    - family-names: Zhang
+      given-names: Chunwen
+    - family-names: Qiao
+      given-names: Lei
+    - family-names: Wang
+      given-names: Xuyang
+  year: 2026
+  url: "https://arxiv.org/abs/2609.30214"

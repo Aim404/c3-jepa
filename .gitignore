@@ -1,0 +1,21 @@
+# data and artefacts (never commit recordings or checkpoints)
+data/
+runs/
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.npy
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
