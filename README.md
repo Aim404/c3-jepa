@@ -84,6 +84,13 @@ Defaults: `λ_m = 1.0`, `λ_b = 1.0`, `λ_s = 0.03`, `λ_t = 0.10`, `λ_v = 0.20
 slot width `d_s = 256` (adapted to 128 inside the predictor), history `4` steps
 (1 s) → future `12` steps (3 s) at 4 Hz, held-out-view attention with `8` heads.
 
+**A rollout on a real recording** (from the paper's pipeline):
+
+![UUV mask rollout](assets/uuv_mask_rollout.gif)
+
+*Camera views at left, decoded object masks at right — predicted row above the recorded
+one, with the controls taken from the recording.*
+
 ## Commands
 
 | Command | What it does |
