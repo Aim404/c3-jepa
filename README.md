@@ -1,10 +1,11 @@
-# C³-JEPA — minimal reference implementation
+# C³-JEPA
 
 [**Paper**](https://arxiv.org/abs/2609.30214) · [PDF](https://arxiv.org/pdf/2609.30214) · arXiv:2609.30214 (cs.RO) · MIT
 
-Minimal, self-contained implementation of **Underwater C³-JEPA** (cross-view,
-control-conditioned, context-extended): an object-centric multi-view predictive
-world model for near-field heavy-load underwater ROV salvage.
+A world model for ROV salvage. It takes several camera views and the operator's
+controls, and predicts where the object, the gripper and the surrounding scene move
+next. This repository is the reference implementation from the paper — one file,
+runnable on a laptop CPU.
 
 ![C³-JEPA architecture](assets/architecture.png)
 
@@ -12,8 +13,8 @@ world model for near-field heavy-load underwater ROV salvage.
 object slots plus context slots, stage II predicts them autoregressively under the
 control latent.*
 
-One file, one command: it generates its own synthetic recordings and runs the train +
-test loop on CPU in about a minute:
+Everything lives in `c3_jepa.py`. The smoke run generates its own synthetic recordings
+and trains and tests on CPU in about a minute:
 
 ```bash
 pip install -r requirements.txt
