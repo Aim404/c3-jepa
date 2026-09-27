@@ -765,15 +765,17 @@ def main(argv=None):
         out = args.out_dir
         if out.exists():
             shutil.rmtree(out)
+        dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        dev_label = f"cuda ({torch.cuda.get_device_name(0)})" if dev.type == "cuda" else "cpu"
         print(f"[smoke] {len(recs)} synthetic recordings, "
               f"{cfg['history']}+{cfg['future']} window, slots={cfg['n_slots']}, "
-              f"device=cpu-first")
+              f"device={dev_label}")
         model, hist, best = run_train(cfg, recs, out)
         # report on the same held-out recordings the checkpoint was selected on
         _, held_out = split_recordings(recs)
         metrics = evaluate(model, DataLoader(Windows(held_out, cfg["history"] + cfg["future"], 1),
                                              cfg["batch_size"], collate_fn=Windows.collate),
-                           torch.device("cpu"), cfg)
+                           next(model.parameters()).device, cfg)
         # gates: finite losses, a real baseline comparison, and the two weightings
         assert all(math.isfinite(h["train_loss"]) for h in hist), "non-finite training loss"
         assert math.isfinite(metrics["pred_mse"]), "non-finite rollout error"

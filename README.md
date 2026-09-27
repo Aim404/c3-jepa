@@ -14,7 +14,7 @@ object slots plus context slots, stage II predicts them autoregressively under t
 control latent.*
 
 Everything lives in `c3_jepa.py`. The smoke run generates its own synthetic recordings
-and trains and tests on CPU in about a minute:
+and trains and tests end to end — on a GPU when there is one, otherwise on CPU:
 
 ```bash
 pip install -r requirements.txt
@@ -22,7 +22,7 @@ python c3_jepa.py smoke
 ```
 
 ```
-[smoke] 8 synthetic recordings, 4+8 window, slots=6, device=cpu-first
+[smoke] 8 synthetic recordings, 4+8 window, slots=6, device=cpu
 ...            (one JSON line per epoch, 80 epochs)
 {
  "best_val_pred_mse": 0.000757,
@@ -32,6 +32,10 @@ python c3_jepa.py smoke
 }
 [smoke] OK — training and testing both ran end to end.
 ```
+
+On a GPU the same command prints `device=cuda (<device name>)`; on an A800 it takes 36 s
+instead of 86 s. The numbers move slightly between devices — same loss surface, another
+point on it — so read the block above as one run, not a fixed result.
 
 The smoke run is a wiring test, not a benchmark: everything trains, and the 8-step
 rollout beats persistence on the two recordings held out of training. The paper's
@@ -96,7 +100,7 @@ one, with the controls taken from the recording.*
 
 | Command | What it does |
 |---|---|
-| `python c3_jepa.py smoke` | synthetic recordings, CPU, a few seconds; writes `runs/smoke/` |
+| `python c3_jepa.py smoke` | synthetic recordings, GPU when one is present; writes `runs/smoke/` |
 | `python c3_jepa.py train --data-dir data/recs --out-dir runs/example` | train on real recordings |
 | `python c3_jepa.py test --data-dir data/recs --ckpt runs/example/ckpt/best.pt` | evaluate a checkpoint |
 
